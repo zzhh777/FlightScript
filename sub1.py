@@ -21,8 +21,8 @@ train_X = X[:, : 12]
 train_Y = X[:, 12]
 print(train_X.shape)
 
-clf = linear_model.LinearRegression()
-clf.fit(train_X, train_Y)
+# clf = linear_model.LinearRegression()
+# clf.fit(train_X, train_Y)
 # score = cross_validation.cross_val_score(clf, train_X, train_Y, cv = 5)
 # print(clf.coef_)
 # print("LR:" + str(score.mean()))
@@ -33,16 +33,24 @@ clf.fit(train_X, train_Y)
 # print(clf.coef0)
 # print("KR:" + str(score.mean()))
 #
-# clf = GradientBoostingRegressor(n_estimators = 100, learning_rate=0.1)
-# clf.fit(train_X, train_Y)
+clf = GradientBoostingRegressor(n_estimators = 100, learning_rate=0.1)
+clf.fit(train_X, train_Y)
 # score = cross_validation.cross_val_score(clf, train_X, train_Y, cv = 5)
 # print(clf.feature_importances_)
 # print("GBDT:" + str(score.mean()))
 
-for i in range(553, 570):
+#predict
+for i in range(553, 571):
     print(i)
     X = wifi_t.ix[:, i - 5 : i + 1]
     X = np.append(wifi_t.ix[:, i - 144 - 2 : i - 144 + 5], X, axis = 1)
     wifi_t[i] = clf.predict(X)
 
-wifi_t.ix[553:].to_csv('res.csv', index = False)
+#submit
+res = wifi_t.ix[:, 553:]
+sub = pd.read_csv('sub_template.csv')
+res = res.as_matrix().reshape(1, res.shape[0] * res.shape[1])
+sub['passengerCount'] = res[0]
+sub.to_csv('sub1_GBDT.csv', index = False)
+
+
